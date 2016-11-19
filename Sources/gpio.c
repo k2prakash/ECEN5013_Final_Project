@@ -111,13 +111,15 @@ void display_color(uint8_t color_code) {
  * This function will reset the TPM Muxed pins and
  * configure the pins as RGB High out pins
  */
-void set_pins_for_color()
+void set_pins_for_gpio()
 {
-	PORTB_PCR18 &= ~PORT_PCR_MUX(3);
-    PORTB_PCR19 &= ~PORT_PCR_MUX(3);
-	//PORTD_PCR1 &= ~PORT_PCR_MUX(4);
-	PORTB_PCR18 = PORT_PCR_MUX(1);
-	PORTB_PCR19 = PORT_PCR_MUX(1);
+	//unset the pins for operation from UART
+	PORTA_PCR1 &= ~PORT_PCR_MUX(2);        // Setting Pin 1 of Port A to be UART0_RX
+	PORTA_PCR2 &= ~PORT_PCR_MUX(2);		  // Setting Pin 2 of Port A to be UART0_TX
+
+	// set the pins for GPIO data
+	PORTA_PCR1 = PORT_PCR_MUX(1);
+	PORTA_PCR2 = PORT_PCR_MUX(1);
 	//PORTD_PCR1 = PORT_PCR_MUX(1);
 }
 

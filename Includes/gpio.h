@@ -31,7 +31,7 @@
 
 void gpio_init(void);
 void display_color(uint8_t color_code);
-void set_pins_for_color();
+void set_pins_for_gpio();
 
 
 

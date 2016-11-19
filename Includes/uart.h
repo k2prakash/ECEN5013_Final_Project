@@ -23,6 +23,7 @@ int uart0_getstr(char *str);
 
 void uart0_getstr_n(char *str, uint8_t size);
 
+void set_pins_for_uart();
 
 
 
