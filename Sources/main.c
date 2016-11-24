@@ -28,18 +28,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "MKL25Z4.h"
+#include "main.h"
 
 static int i = 0;
+char ch = '0';
 
 int main(void)
 {
-
+    gpio_init();
+	uart0_init(BAUDRATE);
     /* Write your code here */
 
     /* This for loop should be replaced. By default this loop allows a single stepping. */
     for (;;) {
-        i++;
+
+    	ch = uart0_getch();
+    	uart0_putch(ch);
+
     }
     /* Never leave main */
     return 0;

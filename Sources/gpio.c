@@ -7,6 +7,7 @@
 
 #include "MKL25Z4.h"
 #include "gpio.h"
+#include "delay.h"
 
 /*
  * This function will initialize all the registers required for GPIO
@@ -14,97 +15,108 @@
  */
 void gpio_init()
 {
-	SIM_SCGC5 |= SIM_SCGC5_PORTA_MASK;  // SETS CLOCK FOR PORT-A
-	SIM_SCGC5 |= SIM_SCGC5_PORTC_MASK;  // SETS CLOCK FOR PORT-C
+	SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;  // SETS CLOCK FOR PORT-C
 	SIM_SCGC5 |= SIM_SCGC5_PORTD_MASK;  // SETS CLOCK FOR PORT-C
 
+	PORTB_PCR0 =  PORT_PCR_MUX(1);        // Setting Pin 1 of Port A to be used as GPIO
+	PORTB_PCR1 =  PORT_PCR_MUX(1);		  // Setting Pin 2 of Port A to be used as GPIO
+	PORTB_PCR2 =  PORT_PCR_MUX(1);		  // Setting Pin 4 of Port D to be used as GPIO
 
-	PORTB_PCR18 = PORT_PCR_MUX(1);        // Setting Pin 18 of Port B to be used as GPIO
-	PORTB_PCR19 = PORT_PCR_MUX(1);		  // Setting Pin 19 of Port B to be used as GPIO
-	PORTB_PCR8 = PORT_PCR_MUX(1);		  // Setting Pin 1 of Port D to be used as GPIO
+	PORTD_PCR0 =  PORT_PCR_MUX(1);        // Setting Pin 1 of Port A to be used as GPIO
+	PORTD_PCR1 =  PORT_PCR_MUX(1);		  // Setting Pin 2 of Port A to be used as GPIO
+	PORTD_PCR2 =  PORT_PCR_MUX(1);		  // Setting Pin 4 of Port D to be used as GPIO
+	PORTD_PCR3 =  PORT_PCR_MUX(1);		  // Setting Pin 12 of Port A to be used as GPIO
+	PORTD_PCR4 =  PORT_PCR_MUX(1);        // Setting Pin 1 of Port A to be used as GPIO
+	PORTD_PCR5 =  PORT_PCR_MUX(1);		  // Setting Pin 2 of Port A to be used as GPIO
+	PORTD_PCR6 =  PORT_PCR_MUX(1);		  // Setting Pin 4 of Port D to be used as GPIO
+	PORTD_PCR7 =  PORT_PCR_MUX(1);		  // Setting Pin 12 of Port A to be used as GPIO
 
-	/* Set the initial output state to high */
-	GPIOB_PSOR |= RED_SHIFT;
 
 	/* Set the pins direction to output */
-	GPIOB_PDDR |= RED_SHIFT;
-
-	/* Set the initial output state to high */
-	GPIOB_PSOR |= GREEN_SHIFT;
-
-	/* Set the pins direction to output */
-	GPIOB_PDDR |= GREEN_SHIFT;
-
-	/* Set the PTD1 pin multiplexer to GPIO mode */
+	GPIOB_PDDR |= 0x07;
+	GPIOB_PDOR = 0x00;
 
 
-	/* Set the initial output state to high */
-	//GPIOD_PSOR = BLUE_SHIFT;
 
 	/* Set the pins direction to output */
-	//GPIOD_PDDR |= BLUE_SHIFT;
+	GPIOD_PDDR |= DATA_OUT;
+	/* Set the initial output state to high */
+    //GPIOD_PSOR |= DATA_OUT;
+
+	lcd_init_sequence();
 
 }
 
-/*
- * This function will set the RGB combination for the LED
- * The function takes a color code with values ranging from 0-7
- */
-void display_color(uint8_t color_code) {
-	switch (color_code) {
+void lcd_init_sequence()
+{
+	LCD_DISABLE;
+	delay(100);
 
-	// Black
-	case 0:
-		    BLUE_OFF;
-			RED_OFF;
-			GREEN_OFF;
-			break;
+	LCD_WRITE_CMD;
+	LCD_ENABLE;
+	GPIOD_PDOR = FUNCTION_SET;
+	LCD_DISABLE;
+	delay(5);
 
-	// Green
-	case 1:
-			BLUE_OFF;
-			RED_OFF;
-			GREEN_ON;
-			break;
+	LCD_WRITE_CMD;
+	LCD_ENABLE;
+	GPIOD_PDOR = FUNCTION_SET;
+	LCD_DISABLE;
+	delay(1);
 
-    // Red
-	case 2: BLUE_OFF;
-			RED_ON;
-		    GREEN_OFF;
-		    break;
+	LCD_WRITE_CMD;
+	LCD_ENABLE;
+	GPIOD_PDOR = FUNCTION_SET;
+	LCD_DISABLE;
+	delay(1);
 
-    // Yellow/ Orange
-	case 3: BLUE_OFF;
-		    RED_ON;
-		    GREEN_ON;
-		    break;
+	LCD_WRITE_CMD;
+	LCD_ENABLE;
+	GPIOD_PDOR = SP_FUNCTION_SET;
+	LCD_DISABLE;
+	delay(1);
 
-    // BLUE
-	case 4: BLUE_ON;
-		    RED_OFF;
-		    GREEN_OFF;
-		    break;
+	//Step 6
+	LCD_WRITE_CMD;
+	LCD_ENABLE;
+	GPIOD_PDOR = LCD_DISPLAY_OFF;
+	LCD_DISABLE;
+	delay(1);
+	//lcdbusywait();
 
-   //AQua
-	case 5: BLUE_ON;
-		    RED_OFF;
-		    GREEN_ON;
-		    break;
+	LCD_WRITE_CMD;
+	LCD_ENABLE;
+	GPIOD_PDOR = LCD_CLEAR;
+	LCD_DISABLE;
+	delay(3);
 
-    // Violet
-	case 6: BLUE_ON;
-		    RED_ON;
-		    GREEN_OFF;
-		    break;
+	LCD_WRITE_CMD;
+	LCD_ENABLE;
+	GPIOD_PDOR = LCD_ENTRY_MODE; // send the code 0x06 to the lcd pointer. This will set the cursor and the blink type
+	LCD_DISABLE;
+	delay(1);
 
-    // White
-	case 7: RED_ON;
-		    BLUE_ON;
-		    GREEN_ON;
-		    break;
+	//Step 7
+	LCD_WRITE_CMD;
+	LCD_ENABLE;
+	GPIOD_PDOR = LCD_DISPLAY_ON; // send the code 0x0f to the lcd pointer. This will turn the display on
+	LCD_DISABLE;
+	delay(1);
 
+
+}
+
+void delay_ms(int multiplier) {
+	for (int n=0;n < 29*multiplier; n++);
+}
+
+void lcd_busy_wait()
+{
+	LCD_READ_CMD;
+	while(BUSY_CON & GPIOD_PDIR)
+	{
 	}
-
+	 return;
 }
 
 /*

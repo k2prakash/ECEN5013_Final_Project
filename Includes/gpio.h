@@ -7,32 +7,35 @@
 #ifndef INCLUDES_GPIO_H_
 #define INCLUDES_GPIO_H_
 
-#define PIN(x)			1 << x
+#define PB_LCD_RS 		    (0)
+#define PB_LCD_RW		    (1)
+#define PB_LCD_EN		    (2)
 
-#define RED				(18)
-#define GREEN			(19)
-#define BLUE			(1)
 
-#define RED_SHIFT		(1 << RED)
-#define GREEN_SHIFT		(1 << GREEN)
-#define BLUE_SHIFT		(1 << BLUE)
 
-#define RED_OFF			(GPIOB_PSOR = RED_SHIFT)
-#define RED_ON			(GPIOB_PCOR = RED_SHIFT)
-#define RED_TOGGLE   	(GPIOB_PTOR = RED_SHIFT)
+#define DATA_OUT		0xFF
+#define PORTB_DATA_OUT 0x00
+#define LCD_ENABLE  (GPIOB_PDOR |= 0x04)
+#define LCD_DISABLE (GPIOB_PDOR &= 0x03)
 
-#define GREEN_OFF		(GPIOB_PSOR = GREEN_SHIFT)
-#define GREEN_ON		(GPIOB_PCOR = GREEN_SHIFT)
-#define GREEN_TOGGLE   	(GPIOB_PTOR = GREEN_SHIFT)
+#define LCD_WRITE_CMD (GPIOB_PDOR &= 0x04)
+#define LCD_READ_CMD ( GPIOB_PDOR = 0x02)
+#define FUNCTION_SET 0x30
+#define SP_FUNCTION_SET 0x38
+#define LCD_DISPLAY_OFF 0x08
+#define LCD_DISPLAY_ON 0x0f
+#define LCD_ENTRY_MODE 0x06
+#define LCD_CLEAR 0x01
+#define ONE_MILL_SEC 3190
+#define BUSY_CON 0x80
 
-#define BLUE_OFF		(GPIOD_PSOR = BLUE_SHIFT)
-#define BLUE_ON			(GPIOD_PCOR = BLUE_SHIFT)
-#define BLUE_TOGGLE   	(GPIOD_PTOR = BLUE_SHIFT)
+
 
 void gpio_init(void);
-void display_color(uint8_t color_code);
 void set_pins_for_gpio();
-
+void delay_ms(int multiplier);
+void lcd_busy_wait();
+void lcd_init_sequence();
 
 
 
