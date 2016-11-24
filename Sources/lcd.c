@@ -54,52 +54,52 @@ void lcd_init_sequence()
 
 	LCD_WRITE_CMD;
 	LCD_ENABLE;
-	GPIOD_PDOR = FUNCTION_SET;
+	SP_FUNCTION_SET;
 	LCD_DISABLE;
 	delay(5);
 
 	LCD_WRITE_CMD;
 	LCD_ENABLE;
-	GPIOD_PDOR = FUNCTION_SET;
+	SP_FUNCTION_SET;
 	LCD_DISABLE;
 	delay(1);
 
 	LCD_WRITE_CMD;
 	LCD_ENABLE;
-	GPIOD_PDOR = FUNCTION_SET;
+	SP_FUNCTION_SET;
 	LCD_DISABLE;
 	delay(1);
 
 	LCD_WRITE_CMD;
 	LCD_ENABLE;
-	GPIOD_PDOR = SP_FUNCTION_SET;
+	FUNCTION_SET;
 	LCD_DISABLE;
 	delay(1);
 
 	//Step 6
 	LCD_WRITE_CMD;
 	LCD_ENABLE;
-	GPIOD_PDOR = LCD_DISPLAY_OFF;
+	LCD_DISPLAY_OFF;
 	LCD_DISABLE;
 	delay(1);
 	//lcdbusywait();
 
 	LCD_WRITE_CMD;
 	LCD_ENABLE;
-	GPIOD_PDOR = LCD_CLEAR;
+	LCD_CLEAR;
 	LCD_DISABLE;
 	delay(3);
 
 	LCD_WRITE_CMD;
 	LCD_ENABLE;
-	GPIOD_PDOR = LCD_ENTRY_MODE; // send the code 0x06 to the lcd pointer. This will set the cursor and the blink type
+	LCD_ENTRY_MODE; // send the code 0x06 to the lcd pointer. This will set the cursor and the blink type
 	LCD_DISABLE;
 	delay(1);
 
 	//Step 7
 	LCD_WRITE_CMD;
 	LCD_ENABLE;
-	GPIOD_PDOR = LCD_DISPLAY_ON; // send the code 0x0f to the lcd pointer. This will turn the display on
+	LCD_DISPLAY_ON; // send the code 0x0f to the lcd pointer. This will turn the display on
 	LCD_DISABLE;
 	delay(1);
 
