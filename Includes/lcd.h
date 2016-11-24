@@ -4,8 +4,8 @@
  *  Created on: Oct 6, 2016
  *      Author: kprakash
  */
-#ifndef INCLUDES_GPIO_H_
-#define INCLUDES_GPIO_H_
+#ifndef INCLUDES_LCD_H_
+#define INCLUDES_LCD_H_
 
 #define PB_LCD_RS 		    (0)
 #define PB_LCD_RW		    (1)
@@ -20,6 +20,7 @@
 
 #define LCD_WRITE_CMD (GPIOB_PDOR &= 0x04)
 #define LCD_READ_CMD ( GPIOB_PDOR = 0x02)
+
 #define FUNCTION_SET 0x30
 #define SP_FUNCTION_SET 0x38
 #define LCD_DISPLAY_OFF 0x08
@@ -31,12 +32,10 @@
 
 
 
-void gpio_init(void);
-void set_pins_for_gpio();
-void delay_ms(int multiplier);
+void lcd_init(void);
 void lcd_busy_wait();
 void lcd_init_sequence();
 
 
 
-#endif /* INCLUDES_GPIO_H_ */
+#endif /* INCLUDES_LCD_H_ */

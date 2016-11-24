@@ -9,7 +9,7 @@
 #define INCLUDES_MAIN_H_
 
 #include "uart.h"
-#include "gpio.h"
+#include "lcd.h"
 #include "delay.h"
 #include "MKL25Z4.h"
 

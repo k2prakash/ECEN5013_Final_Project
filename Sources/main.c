@@ -35,7 +35,7 @@ char ch = '0';
 
 int main(void)
 {
-    gpio_init();
+    lcd_init();
 	uart0_init(BAUDRATE);
     /* Write your code here */
 
