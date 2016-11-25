@@ -12,9 +12,18 @@
 #include "lcd.h"
 #include "delay.h"
 #include "MKL25Z4.h"
+#include "memory.h"
+#include "data.h"
+#include "log.h"
 
 
-#define BAUDRATE 115200
+#define BAUDRATE 						115200
+#define MESSAGE_BUFFER_SIZE_50 			50
+#define MESSAGE_BUFFER_SIZE_25 			25
+#define MESSAGE_BUFFER_SIZE_16 			16
+#define ROW_COL_STR_BUFFER_SIZE 		2
+#define LOG_NEWLINE_LEN					2
 
+#define NEWLINE							"\r\n"
 
 #endif /* INCLUDES_MAIN_H_ */

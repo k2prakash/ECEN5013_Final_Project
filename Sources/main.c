@@ -32,23 +32,56 @@
 
 static int i = 0;
 char ch = '0';
+uint8_t r = 0;
+uint8_t c = 0;
+char row_col_buff[ROW_COL_STR_BUFFER_SIZE];
+char user_ip_buff[MESSAGE_BUFFER_SIZE_50];
 
 int main(void)
 {
-    lcd_init();
+
 	uart0_init(BAUDRATE);
+	lcd_init();
+
     /* Write your code here */
 
     /* This for loop should be replaced. By default this loop allows a single stepping. */
     for (;;) {
+    	log0("Enter the row number: 0 - 3\r\n", MESSAGE_BUFFER_SIZE_50);
+    	uart0_getstr_n(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
+		log0(NEWLINE,LOG_NEWLINE_LEN);
+		r = (uint8_t)my_atoi(row_col_buff);
+		my_memzero(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
 
-    	ch = uart0_getch();
-    	uart0_putch(ch);
+		log0("Enter the col number: 0 - 15\r\n", MESSAGE_BUFFER_SIZE_50);
+		uart0_getstr_n(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
+		log0(NEWLINE,LOG_NEWLINE_LEN);
+		c = (uint8_t)my_atoi(row_col_buff);
+
+		my_memzero(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
+
+		if ((r >= 0) && (r <= 3) && (c >=0) && (c <= 15))
+		{
+			lcd_goto_xy(r,c);
+			log0("Enter the string to display on the LCD\r\n", MESSAGE_BUFFER_SIZE_50);
+			uart0_getstr_n(user_ip_buff, MESSAGE_BUFFER_SIZE_50); // replace with circular buffer.
+			log0(NEWLINE,LOG_NEWLINE_LEN);
+			lcd_put_str(user_ip_buff);
+			my_memzero(user_ip_buff, MESSAGE_BUFFER_SIZE_50);
+
+		}
+		else
+		{
+			log0("Wrong combination of row/col entered.\r\n", MESSAGE_BUFFER_SIZE_50);
+			continue;
+		}
+
 
     }
     /* Never leave main */
     return 0;
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 // EOF
 ////////////////////////////////////////////////////////////////////////////////
