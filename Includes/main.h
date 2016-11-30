@@ -15,6 +15,8 @@
 #include "memory.h"
 #include "data.h"
 #include "log.h"
+#include "i2c.h"
+#include "eeprom.h"
 
 
 #define BAUDRATE 						115200

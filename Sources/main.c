@@ -37,11 +37,40 @@ uint8_t c = 0;
 char row_col_buff[ROW_COL_STR_BUFFER_SIZE];
 char user_ip_buff[MESSAGE_BUFFER_SIZE_50];
 
-int main(void)
+/*
+ * The ISR for UART0.
+ * The Interrupt will be enabled every time a user
+ * inputs a character into the serial debugger
+ *
+ */
+/*extern void UART0_IRQHandler (void)
 {
 
+	if (UART0_S1 & UART0_S1_RDRF_MASK)
+	{
+		ch = UART0_D;					// Clear the RDRF flag by reading the contents.
+		uart_recieve_cbuffer(&rx_buffer, (uint8_t)ch);
+
+	}
+}*/
+
+int main(void)
+{
+    uint8_t val = 0;
+	// __enable_irq();
 	uart0_init(BAUDRATE);
 	lcd_init();
+	i2c_init();
+
+	//I2C_START();
+	//I2C_STOP();
+	eeprom_reset();
+	eeprom_write_byte(EEPROM_I2C_ADDRESS, 0x00, 4);
+	//eeprom_write_byte(EEPROM_I2C_ADDRESS, 0x01, 9);
+	//val = eeprom_read_byte(EEPROM_I2C_ADDRESS, 0x00);
+	//val = eeprom_read_byte(EEPROM_I2C_ADDRESS, 0x00);
+	val = eeprom_read_byte(EEPROM_I2C_ADDRESS, 0x00);
+
 
     /* Write your code here */
 
