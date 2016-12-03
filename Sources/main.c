@@ -62,20 +62,18 @@ int main(void)
 	lcd_init();
 	i2c_init();
 
-	//I2C_START();
-	//I2C_STOP();
+	SIM_SCGC5 |= SIM_SCGC5_PORTA_MASK; 	// Turn on clock to Port E for the I2C pins
+	PORTA_PCR4 = PORT_PCR_MUX(1);		// Set Port E Pin 0 as the GPIO SDA pin
+	PORTA_PCR5 = PORT_PCR_MUX(1);		// Set Port E Pin 1 as the GPIO SCL pin
+
+	GPIOA_PDDR |= 0x20;
+
 	eeprom_reset();
-	eeprom_write_byte(EEPROM_I2C_ADDRESS, 0x00, 4);
-	//eeprom_write_byte(EEPROM_I2C_ADDRESS, 0x01, 9);
-	//val = eeprom_read_byte(EEPROM_I2C_ADDRESS, 0x00);
-	//val = eeprom_read_byte(EEPROM_I2C_ADDRESS, 0x00);
-	val = eeprom_read_byte(EEPROM_I2C_ADDRESS, 0x00);
+	eeprom_write_byte(EEPROM_I2C_ADDRESS, 0x02, 6);
+	val = eeprom_read_byte(EEPROM_I2C_ADDRESS, 0x02);
 
-
-    /* Write your code here */
-
-    /* This for loop should be replaced. By default this loop allows a single stepping. */
     for (;;) {
+
     	log0("Enter the row number: 0 - 3\r\n", MESSAGE_BUFFER_SIZE_50);
     	uart0_getstr_n(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
 		log0(NEWLINE,LOG_NEWLINE_LEN);
@@ -104,7 +102,6 @@ int main(void)
 			log0("Wrong combination of row/col entered.\r\n", MESSAGE_BUFFER_SIZE_50);
 			continue;
 		}
-
 
     }
     /* Never leave main */

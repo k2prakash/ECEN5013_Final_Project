@@ -16,6 +16,7 @@
 #define I2C_READ				0x01
 #define I2C_SCL					0x01
 #define I2C_SDA					0x00
+#define I2C_SDA_MASK			0x01
 
 
 
@@ -53,7 +54,7 @@
 #define SET_SCL					GPIOE_PSOR |= (1<<I2C_SCL)
 #define CLEAR_SCL				GPIOE_PCOR |= (1<<I2C_SCL)
 
-#define GET_SDA                 (GPIOE_PDIR & 0x01)
+#define GET_SDA                 (0x01 & GPIOE_PDIR)
 
 
 void i2c_init();

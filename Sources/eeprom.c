@@ -16,12 +16,12 @@ void eeprom_write_byte (uint8_t slave_addr, uint8_t word_addr, uint8_t data)
 	i2c_write_byte(word_addr); //send the word address in the bus and wait for SDA line to get pulled low by the eeprom
 	i2c_write_byte(data); // send the byte to be written into the eeprom and wait for SDA line to get pulled low by the eeprom
 	I2C_STOP(); // send a stop signal by making the SCL high and the SDA line transition from low to High
-	do
+	/*do
 	{ // Poll for the acknowledgement from the EEPROM
 		I2C_START(); // Signal a start in the I2C bus by having the SCL high and the SDA signal going from High to low
 		b = i2c_write_byte(word_addr); //send the word address in the bus and wait for SDA line to get pulled low by the eeprom
 	} while (b != 1); // loop till an acknowledgement is received
-
+	*/
 }
 
 void eeprom_page_write (uint8_t slave_addr, uint8_t word_addr, uint8_t * buff)
@@ -50,6 +50,7 @@ void eeprom_page_write (uint8_t slave_addr, uint8_t word_addr, uint8_t * buff)
 uint8_t eeprom_read_byte(uint8_t slave_addr, uint8_t word_addr)
 {
     uint8_t ch = '\0';
+    uint8_t ack = 0;
     I2C_START(); // Signal a start in the I2C bus by having the SCL high and the SDA signal going from High to low
     i2c_write_byte(slave_addr); //send the slave address of the EEPROM in the bus and wait for SDA line to get pulled low by the eeprom
     i2c_write_byte(word_addr); //send the word address in the bus and wait for SDA line to get pulled low by the eeprom

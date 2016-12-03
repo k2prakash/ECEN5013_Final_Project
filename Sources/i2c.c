@@ -24,8 +24,10 @@ void i2c_init()
 	SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK; 	// Turn on clock to Port E for the I2C pins
 	PORTE_PCR0 = PORT_PCR_MUX(1);		// Set Port E Pin 0 as the GPIO SDA pin
 	PORTE_PCR1 = PORT_PCR_MUX(1);		// Set Port E Pin 1 as the GPIO SCL pin
-
 	GPIOE_PDDR |= 0x03;
+
+
+
 }
 
 /*
@@ -63,9 +65,13 @@ uint8_t i2c_write_byte(uint8_t byte) {
 * word and left shift it till the entire byte word is filled. the function then returns the
 * byte back to the program
 */
+
 uint8_t i2c_read_byte() {
 	uint8_t i = 0;
 	uint8_t byte = 0;
+	// clear the SDA pin - bit 0 to 0 to function as Input pin.
+	GPIOE_PDDR &= ~I2C_SDA_MASK;
+	CLEAR_SDA;
 	for (i = 0; i < 8; i++)
 	{
 		SET_SCL;
@@ -73,14 +79,55 @@ uint8_t i2c_read_byte() {
 		{
 			byte |=1;
 		}
+		for(int j=0;j<5;j++);
+		CLEAR_SCL;
 		if(i<7)
 		{
 			byte<<=1;
 		}
-		CLEAR_SCL;
+
 	}
+	// set the SDA pin - bit 0 to 1 to function as Output pin
+	 GPIOE_PDDR |= I2C_SDA_MASK;
+
+
 	return byte;
 }
+
+/*
+uint8_t i2c_read_byte(uint8_t ack) {
+	uint8_t i,j,k = 0;
+	uint8_t byte = 0;
+	SET_SDA;
+	// clear the SDA pin - bit 0 to 0 to function as Input pin.
+	GPIOE_PDDR &= ~I2C_SDA_MASK;
+	for (i = 0; i < 8; i++)
+	{
+		byte<<=1;
+		SET_SCL;
+		k = GET_SDA;
+		if(k)
+		{
+			//for(j=0;j<1;j++);
+			byte |=1;
+		}
+		CLEAR_SCL;
+	}
+	// set the SDA pin - bit 0 to 1 to function as Output pin
+	GPIOE_PDDR |= I2C_SDA_MASK;
+	if (ack)
+	{
+		CLEAR_SDA;
+	}else
+	{
+		SET_SDA;
+	}
+	i2c_nack();
+	return byte;
+}
+*/
+
+
 
 /*
 * This function will return an Acknowledgement. It works by making the SDA low, making SCL transition
