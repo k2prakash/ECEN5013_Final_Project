@@ -12,6 +12,13 @@
 
 #define CLOCKDIV 16
 #define CORECLK 24000000
+#define MESSAGE_BUFFER_SIZE_50 			50
+#define MESSAGE_BUFFER_SIZE_25 			25
+#define MESSAGE_BUFFER_SIZE_16 			16
+#define LOG_NEWLINE_LEN					2
+#define NEWLINE							"\r\n"
+
+
 
 void uart0_init(uint32_t baudrate);
 

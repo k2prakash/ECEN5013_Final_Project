@@ -61,6 +61,9 @@ int main(void)
 	uart0_init(BAUDRATE);
 	lcd_init();
 	i2c_init();
+	spi_init();
+	wiznet_init();
+
 
 	SIM_SCGC5 |= SIM_SCGC5_PORTA_MASK; 	// Turn on clock to Port E for the I2C pins
 	PORTA_PCR4 = PORT_PCR_MUX(1);		// Set Port E Pin 0 as the GPIO SDA pin

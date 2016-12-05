@@ -34,18 +34,18 @@ void lcd_init()
 	SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;  // SETS CLOCK FOR PORT-C
 	SIM_SCGC5 |= SIM_SCGC5_PORTD_MASK;  // SETS CLOCK FOR PORT-C
 
-	PORTB_PCR0 =  PORT_PCR_MUX(1);        // Setting Pin 1 of Port A to be used as GPIO
-	PORTB_PCR1 =  PORT_PCR_MUX(1);		  // Setting Pin 2 of Port A to be used as GPIO
-	PORTB_PCR2 =  PORT_PCR_MUX(1);		  // Setting Pin 4 of Port D to be used as GPIO
+	PORTB_PCR0 =  PORT_PCR_MUX(1);        // Setting Pin 0 of Port B to be used as GPIO
+	PORTB_PCR1 =  PORT_PCR_MUX(1);		  // Setting Pin 1 of Port B to be used as GPIO
+	PORTB_PCR2 =  PORT_PCR_MUX(1);		  // Setting Pin 2 of Port B to be used as GPIO
 
-	PORTD_PCR0 =  PORT_PCR_MUX(1);        // Setting Pin 1 of Port A to be used as GPIO
-	PORTD_PCR1 =  PORT_PCR_MUX(1);		  // Setting Pin 2 of Port A to be used as GPIO
-	PORTD_PCR2 =  PORT_PCR_MUX(1);		  // Setting Pin 4 of Port D to be used as GPIO
-	PORTD_PCR3 =  PORT_PCR_MUX(1);		  // Setting Pin 12 of Port A to be used as GPIO
-	PORTD_PCR4 =  PORT_PCR_MUX(1);        // Setting Pin 1 of Port A to be used as GPIO
-	PORTD_PCR5 =  PORT_PCR_MUX(1);		  // Setting Pin 2 of Port A to be used as GPIO
-	PORTD_PCR6 =  PORT_PCR_MUX(1);		  // Setting Pin 4 of Port D to be used as GPIO
-	PORTD_PCR7 =  PORT_PCR_MUX(1);		  // Setting Pin 12 of Port A to be used as GPIO
+	PORTD_PCR0 =  PORT_PCR_MUX(1);        // Setting Pin 0 of Port D to be used as GPIO
+	PORTD_PCR1 =  PORT_PCR_MUX(1);		  // Setting Pin 1 of Port D to be used as GPIO
+	PORTD_PCR2 =  PORT_PCR_MUX(1);		  // Setting Pin 2 of Port D to be used as GPIO
+	PORTD_PCR3 =  PORT_PCR_MUX(1);		  // Setting Pin 3 of Port D to be used as GPIO
+	PORTD_PCR4 =  PORT_PCR_MUX(1);        // Setting Pin 4 of Port D to be used as GPIO
+	PORTD_PCR5 =  PORT_PCR_MUX(1);		  // Setting Pin 5 of Port D to be used as GPIO
+	PORTD_PCR6 =  PORT_PCR_MUX(1);		  // Setting Pin 6 of Port D to be used as GPIO
+	PORTD_PCR7 =  PORT_PCR_MUX(1);		  // Setting Pin 7 of Port D to be used as GPIO
 
 
 	/* Set the pins direction to output */
