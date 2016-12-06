@@ -36,7 +36,7 @@ void spi_init(void)
   SPI0_C1 = SPI_C1_MSTR_MASK | SPI_C1_SSOE_MASK; // | SPI_C1_CPHA_MASK;   //Set SPI0 to Master & SS pin to auto SS
   SPI0_C2 = 0x00;   //Master SS pin acts as slave select output
   SPI0_C1 |= SPI_C1_SPE_MASK;    //Enable SPI0
-  SPI0_BR = (SPI_BR_SPPR(0x02) | SPI_BR_SPR(0x08));     //Set baud rate prescale divisor to 3 & set baud rate divisor to 64 for baud rate of 15625 hz
+  SPI0_BR = (SPI_BR_SPPR(0x02) | SPI_BR_SPR(0x08));     //Set baud rate prescale divisor to 3 & set baud rate divisor to 512 for baud rate of 15625 hz
 
   GPIOB_PDDR |= 1<<8;
   GPIOB_PSOR |= 1<<8; //toggle CS
@@ -44,24 +44,25 @@ void spi_init(void)
 
 // Read size number of characters into buffer p from register at address
 uint8_t spi_read() {
-	uint8_t data;
-	while (!(SPI_S_SPRF_MASK & SPI0_S))
+	char data;
+	while (!(SPI0_S & SPI_S_SPRF_MASK))
 	{
 		__asm__("nop");  //While buffer is not empty do nothing
 	}
-	data = SPI0_D;
-	return data;
+	return SPI0_D;
+
 }
 
-void spi_write(uint8_t data)
+uint8_t spi_write(uint8_t data)
 {
-
+  SPI0_D = data;
   while(!(SPI_S_SPTEF_MASK & SPI0_S))
   {
     __asm__("nop");  //While buffer is not empty do nothing
   }
 
-  SPI0_D = data;    //Write char to SPI - initially here
+    //Write char to SPI - initially here
+  return SPI0_D;
 
 }
 

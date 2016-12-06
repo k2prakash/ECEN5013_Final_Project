@@ -21,7 +21,7 @@
 
 void spi_init(void);
 uint8_t spi_read();
-void spi_write(uint8_t data);
+uint8_t spi_write(uint8_t data);
 void spi_flush();
 
 size_t spi_read_n();

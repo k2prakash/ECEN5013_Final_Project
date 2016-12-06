@@ -5,11 +5,14 @@
  *      Author: kprakash
  */
 #include "stdint.h"
+#include "stdlib.h"
 #include "MKL25Z4.h"
 #include "spi.h"
 #include "delay.h"
 #include "uart.h"
 #include "log.h"
+#include "data.h"
+#include "memory.h"
 
 #define WIZNET_MAX_DATA_SIZE 	8
 #define HIGHER_BYTE_MASK		0xFF00
@@ -53,3 +56,5 @@ typedef struct WIZNET_Msg_t
  void addr_write(uint32_t addr,uint8_t data);
  uint8_t addr_read(uint32_t addr);
  void wiznet_init();
+ uint8_t SPI_Read(uint32_t addr);
+ void print_number(uint8_t* ip_addr, uint8_t * buff);

@@ -36,8 +36,17 @@ uint32_t number_of_bytes(uint32_t data, int32_t base) {
 * integer to ascii takes place by means of repeated division and obtaining the remainder
 */
 uint8_t * my_itoa(uint8_t * str, int32_t data, int32_t base){
-    uint32_t num = 0; // variable to store the number of ascii characters
+
+	uint32_t num = 0; // variable to store the number of ascii characters
     uint32_t val = 0; // value to store the converted int32_t value to a uint32_t value
+
+    if(data == 0){
+    	*str ='0';
+    	str++;
+    	*str='\0';
+    	return str;
+    }
+
     val+=data; // conversion of int32_t to uint32_t
     num = number_of_bytes(val,base);
 
