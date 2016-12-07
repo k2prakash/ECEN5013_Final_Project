@@ -15,6 +15,7 @@
 #define MESSAGE_BUFFER_SIZE_50 			50
 #define MESSAGE_BUFFER_SIZE_25 			25
 #define MESSAGE_BUFFER_SIZE_16 			16
+#define MESSAGE_BUFFER_SIZE_8 			8
 #define LOG_NEWLINE_LEN					2
 #define NEWLINE							"\r\n"
 

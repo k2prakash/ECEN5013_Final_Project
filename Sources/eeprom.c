@@ -56,9 +56,14 @@ uint8_t eeprom_read_byte(uint8_t slave_addr, uint8_t word_addr)
     i2c_write_byte(word_addr); //send the word address in the bus and wait for SDA line to get pulled low by the eeprom
     I2C_START(); // Signal a start in the I2C bus by having the SCL high and the SDA signal going from High to low
     i2c_write_byte((slave_addr + 1)); //send the slave address of the EEPROM in the bus and wait for SDA line to get pulled low by the eeprom. Notice that we add a 1, to indicate that the last bit is set to perform a read operation
+    GPIOE_PDDR &= ~I2C_SDA_MASK;
+    CLEAR_SDA;
+    i2c_read_byte();
+    i2c_nack();
     ch = i2c_read_byte(); // obtain the character from the eeprom
-    i2c_nack(); // send a NACK to the EEPROM
+    // send a NACK to the EEPROM
     I2C_STOP(); // send a stop signal by making the SCL high and the SDA line transition from low to High
+    GPIOE_PDDR |= I2C_SDA_MASK;
     return ch; // return the character
 }
 

@@ -29,6 +29,7 @@
  */
 
 #include "main.h"
+#include "string.h"
 
 static int i = 0;
 char ch = '0';
@@ -36,6 +37,13 @@ uint8_t r = 0;
 uint8_t c = 0;
 char row_col_buff[ROW_COL_STR_BUFFER_SIZE];
 char user_ip_buff[MESSAGE_BUFFER_SIZE_50];
+uint8_t sockstat;
+uint8_t sockreg;
+uint16_t rsize;
+int getidx,postidx;
+uint8_t buf[MAX_BUF];
+
+
 
 /*
  * The ISR for UART0.
@@ -57,58 +65,132 @@ char user_ip_buff[MESSAGE_BUFFER_SIZE_50];
 int main(void)
 {
     uint8_t val = 0;
+    sockreg=0;
 	// __enable_irq();
 	uart0_init(BAUDRATE);
 	lcd_init();
 	i2c_init();
 	spi_init();
 	wiznet_init();
-
-
-	SIM_SCGC5 |= SIM_SCGC5_PORTA_MASK; 	// Turn on clock to Port E for the I2C pins
-	PORTA_PCR4 = PORT_PCR_MUX(1);		// Set Port E Pin 0 as the GPIO SDA pin
-	PORTA_PCR5 = PORT_PCR_MUX(1);		// Set Port E Pin 1 as the GPIO SCL pin
-
-	GPIOA_PDDR |= 0x20;
-
 	eeprom_reset();
-	eeprom_write_byte(EEPROM_I2C_ADDRESS, 0x02, 6);
-	val = eeprom_read_byte(EEPROM_I2C_ADDRESS, 0x02);
 
     for (;;) {
 
-    	log0("Enter the row number: 0 - 3\r\n", MESSAGE_BUFFER_SIZE_50);
-    	uart0_getstr_n(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
-		log0(NEWLINE,LOG_NEWLINE_LEN);
-		r = (uint8_t)my_atoi(row_col_buff);
-		my_memzero(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
-
-		log0("Enter the col number: 0 - 15\r\n", MESSAGE_BUFFER_SIZE_50);
-		uart0_getstr_n(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
-		log0(NEWLINE,LOG_NEWLINE_LEN);
-		c = (uint8_t)my_atoi(row_col_buff);
-
-		my_memzero(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
-
-		if ((r >= 0) && (r <= 3) && (c >=0) && (c <= 15))
-		{
-			lcd_goto_xy(r,c);
-			log0("Enter the string to display on the LCD\r\n", MESSAGE_BUFFER_SIZE_50);
-			uart0_getstr_n(user_ip_buff, MESSAGE_BUFFER_SIZE_50); // replace with circular buffer.
-			log0(NEWLINE,LOG_NEWLINE_LEN);
-			lcd_put_str(user_ip_buff);
-			my_memzero(user_ip_buff, MESSAGE_BUFFER_SIZE_50);
-
-		}
-		else
-		{
-			log0("Wrong combination of row/col entered.\r\n", MESSAGE_BUFFER_SIZE_50);
-			continue;
-		}
+    	call_to_server();
 
     }
-    /* Never leave main */
     return 0;
+}
+
+void call_to_server()
+{
+	sockstat=addr_read(S0_SR);
+	    switch(sockstat) {
+	     case SOCK_CLOSED:
+	        if (socket(sockreg,MR_TCP,TCP_PORT) > 0) {
+		  // Listen to Socket 0
+		  if (listen(sockreg) <= 0)
+		    delay(1);
+	#if _DEBUG_MODE
+	          log0("Socket Listen!\r\n", MESSAGE_BUFFER_SIZE_16);
+	#endif
+		}
+		break;
+	     case SOCK_ESTABLISHED:
+		// Get the client request size
+	        rsize=recv_size();
+		if (rsize > 0) {
+		  // Now read the client Request
+		  if (recv(sockreg,buf,rsize) <= 0) break;
+	#if _DEBUG_MODE
+	  	  log0("Content:\r\n",MESSAGE_BUFFER_SIZE_16);
+	  	  log0(buf, MAX_BUF);
+	#endif
+	          // Check the Request Header
+		  getidx=strindex((char *)buf,"GET /");
+		  postidx=strindex((char *)buf,"POST /");
+		  if (getidx >= 0 || postidx >= 0) {
+	#if _DEBUG_MODE
+		    log0("Recieved an HTTP request!\r\n",MESSAGE_BUFFER_SIZE_50);
+	#endif
+
+
+//	#if _DEBUG_MODE
+//		    printf("Req. Send!\n");
+//	#endif
+		    // Create the HTTP Response	Header
+		    strcpy((char *)buf,"HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n");
+		    strcat((char *)buf,"<html><body><span style=\"color:#0000A0\">\r\n");
+		    strcat((char *)buf,"<h1>Embedded Web Server</h1>\r\n");
+		    strcat((char *)buf,"<h2>A Project by Kaushik and Ryan</h2>\r\n");
+		    strcat((char *)buf,"<h3>Components: KL25Z board, WIZ811MJ NIC and HD44780 LCD</h3>\r\n");
+		    strcat((char *)buf,"</span></body></html>\r\n");
+	            // Now Send the HTTP Remaining Response
+		    if (send(sockreg,buf,strlen((char *)buf)) <= 0) break;
+
+		  }
+		  else
+		  {
+			  lcd_put_str(buf);
+		  }
+
+		  // Disconnect the socket
+		  disconnect(sockreg);
+	        } else
+		  delay(1);    // Wait for request
+		break;
+	      case SOCK_FIN_WAIT:
+	      case SOCK_CLOSING:
+	      case SOCK_TIME_WAIT:
+	      case SOCK_CLOSE_WAIT:
+	      case SOCK_LAST_ACK:
+	        // Force to close the socket
+		close(sockreg);
+	#if _DEBUG_MODE
+		log0("Socket Close!\r\n",MESSAGE_BUFFER_SIZE_16);
+	#endif
+		break;
+	    }
+}
+
+void lcd_print()
+{
+	log0("Enter the row number: 0 - 3\r\n", MESSAGE_BUFFER_SIZE_50);
+	uart0_getstr_n(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
+	log0(NEWLINE,LOG_NEWLINE_LEN);
+	r = (uint8_t)my_atoi(row_col_buff);
+	my_memzero(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
+
+	log0("Enter the col number: 0 - 15\r\n", MESSAGE_BUFFER_SIZE_50);
+	uart0_getstr_n(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
+	log0(NEWLINE,LOG_NEWLINE_LEN);
+	c = (uint8_t)my_atoi(row_col_buff);
+
+	my_memzero(row_col_buff, ROW_COL_STR_BUFFER_SIZE);
+
+	if ((r >= 0) && (r <= 3) && (c >=0) && (c <= 15))
+	{
+		lcd_goto_xy(r,c);
+		log0("Enter the string to display on the LCD\r\n", MESSAGE_BUFFER_SIZE_50);
+		uart0_getstr_n(user_ip_buff, MESSAGE_BUFFER_SIZE_50); // replace with circular buffer.
+		log0(NEWLINE,LOG_NEWLINE_LEN);
+		lcd_put_str(user_ip_buff);
+		my_memzero(user_ip_buff, MESSAGE_BUFFER_SIZE_50);
+
+	}
+	else
+	{
+		log0("Wrong combination of row/col entered.\r\n", MESSAGE_BUFFER_SIZE_50);
+		return;
+	}
+}
+
+void eeprom_write()
+{
+	uint8_t val = 0;
+	eeprom_write_byte(EEPROM_I2C_ADDRESS, 0x02, 6);
+	val = eeprom_read_byte(EEPROM_I2C_ADDRESS, 0x02);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

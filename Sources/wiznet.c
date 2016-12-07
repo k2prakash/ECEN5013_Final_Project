@@ -102,8 +102,8 @@ void wiznet_init()
 
 	// Setting the Wiznet W5100 RX and TX Memory Size, we use 2KB for Rx/Tx 4 channels
 	log0("\r\nSetting Wiznet RMSR and TMSR\r\n", MESSAGE_BUFFER_SIZE_50);
-	addr_write(RMSR,0x55);
-	addr_write(TMSR,0x55);
+	addr_write(RMSR,NET_MEMALLOC);
+	addr_write(TMSR,NET_MEMALLOC);
 	log0("\r\nDone Wiznet W5100 Initialized!\r\n", MESSAGE_BUFFER_SIZE_50);
 
 }

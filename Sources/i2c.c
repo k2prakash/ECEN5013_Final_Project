@@ -10,16 +10,16 @@ uint8_t mode = 0;
 
 void i2c_init()
 {
-	/*
-	SIM_SCGC5 |= SIM_SCGC5_PORTC_MASK; 	// Turn on clock to Port E for the I2C pins
+
+	SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK; 	// Turn on clock to Port E for the I2C pins
     SIM_SCGC4 |= SIM_SCGC4_I2C1_MASK; 	// Turn on clock to I2C_1` module
 
-    PORTC_PCR10 = PORT_PCR_MUX(2);		// Set Port E Pin 0 as the SDA pin
-    PORTC_PCR11 = PORT_PCR_MUX(2);		// Set Port E Pin 1 as the SCL pin
+    /*PORTE_PCR0 = PORT_PCR_MUX(6);		// Set Port E Pin 0 as the SDA pin
+    PORTC_PCR1 = PORT_PCR_MUX(6);		// Set Port E Pin 1 as the SCL pin
 
     I2C1_F  = 0x14;       				// set MULT and ICR
     I2C1_C1 |= I2C_C1_IICEN_MASK;       // enable IIC
-     */
+	*/
 
 	SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK; 	// Turn on clock to Port E for the I2C pins
 	PORTE_PCR0 = PORT_PCR_MUX(1);		// Set Port E Pin 0 as the GPIO SDA pin
@@ -70,8 +70,7 @@ uint8_t i2c_read_byte() {
 	uint8_t i = 0;
 	uint8_t byte = 0;
 	// clear the SDA pin - bit 0 to 0 to function as Input pin.
-	GPIOE_PDDR &= ~I2C_SDA_MASK;
-	CLEAR_SDA;
+
 	for (i = 0; i < 8; i++)
 	{
 		SET_SCL;
@@ -88,8 +87,6 @@ uint8_t i2c_read_byte() {
 
 	}
 	// set the SDA pin - bit 0 to 1 to function as Output pin
-	 GPIOE_PDDR |= I2C_SDA_MASK;
-
 
 	return byte;
 }
