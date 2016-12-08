@@ -10,6 +10,7 @@
 #include "stdint.h"
 #include "delay.h"
 #include "MKL25Z4.h"
+#include "cbuffer.h"
 
 #define PB_LCD_RS 		    (0)
 #define PB_LCD_RW		    (1)
@@ -65,5 +66,6 @@ void lcd_goto_xy(uint8_t row, uint8_t column);
 void lcd_put_ch(uint8_t c);
 void lcd_print_ch(uint8_t c);
 void lcd_put_str(char * str);
+void lcd_print_cbuff(cbuffer* buff);
 
 #endif /* INCLUDES_LCD_H_ */

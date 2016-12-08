@@ -20,6 +20,8 @@
 #include "spi.h"
 #include "wiznet.h"
 #include "socket.h"
+#include "cbuffer.h"
+#include "uart_buffer.h"
 
 
 #define BAUDRATE 						115200

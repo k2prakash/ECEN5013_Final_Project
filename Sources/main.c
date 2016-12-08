@@ -42,6 +42,8 @@ uint8_t sockreg;
 uint16_t rsize;
 int getidx,postidx;
 uint8_t buf[MAX_BUF];
+cbuffer rx_cbuffer;
+//cbuffer* tx_cbuffer;
 
 
 
@@ -67,7 +69,9 @@ int main(void)
     uint8_t val = 0;
     sockreg=0;
 	// __enable_irq();
-	uart0_init(BAUDRATE);
+    cbuffer_init(&rx_cbuffer,MAX_BUF);
+    //cbuffer_init(tx_cbuffer,MAX_BUF);
+    uart0_init(BAUDRATE);
 	lcd_init();
 	i2c_init();
 	spi_init();
@@ -101,37 +105,32 @@ void call_to_server()
 	        rsize=recv_size();
 		if (rsize > 0) {
 		  // Now read the client Request
-		  if (recv(sockreg,buf,rsize) <= 0) break;
-	#if _DEBUG_MODE
-	  	  log0("Content:\r\n",MESSAGE_BUFFER_SIZE_16);
-	  	  log0(buf, MAX_BUF);
-	#endif
-	          // Check the Request Header
+		  if (recv(sockreg,&rx_cbuffer,rsize) <= 0) break;
+		  cbuffer_copy_to_str(&rx_cbuffer, buf);
+	      // Check the Request Header
 		  getidx=strindex((char *)buf,"GET /");
 		  postidx=strindex((char *)buf,"POST /");
 		  if (getidx >= 0 || postidx >= 0) {
-	#if _DEBUG_MODE
-		    log0("Recieved an HTTP request!\r\n",MESSAGE_BUFFER_SIZE_50);
-	#endif
 
-
-//	#if _DEBUG_MODE
-//		    printf("Req. Send!\n");
-//	#endif
-		    // Create the HTTP Response	Header
-		    strcpy((char *)buf,"HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n");
-		    strcat((char *)buf,"<html><body><span style=\"color:#0000A0\">\r\n");
-		    strcat((char *)buf,"<h1>Embedded Web Server</h1>\r\n");
-		    strcat((char *)buf,"<h2>A Project by Kaushik and Ryan</h2>\r\n");
-		    strcat((char *)buf,"<h3>Components: KL25Z board, WIZ811MJ NIC and HD44780 LCD</h3>\r\n");
-		    strcat((char *)buf,"</span></body></html>\r\n");
-	            // Now Send the HTTP Remaining Response
-		    if (send(sockreg,buf,strlen((char *)buf)) <= 0) break;
+				log0("Received an HTTP request!\r\n",MESSAGE_BUFFER_SIZE_50);
+				log0("Content:\r\n",MESSAGE_BUFFER_SIZE_16);
+				uart_putch_cbuffer(&rx_cbuffer, (rsize+1));
+				log0("\r\n",2);
+				// Create the HTTP Response	Header
+				strcpy((char *)buf,"HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n");
+				strcat((char *)buf,"<html><body><span style=\"color:#0000A0\">\r\n");
+				strcat((char *)buf,"<h1>Embedded Web Server</h1>\r\n");
+				strcat((char *)buf,"<h2>A Project by Kaushik and Ryan</h2>\r\n");
+				strcat((char *)buf,"<h3>Components: KL25Z board, WIZ811MJ NIC and HD44780 LCD</h3>\r\n");
+				strcat((char *)buf,"</span></body></html>\r\n");
+					// Now Send the HTTP Remaining Response
+				if (send(sockreg,buf,strlen((char *)buf)) <= 0) break;
 
 		  }
 		  else
 		  {
-			  lcd_put_str(buf);
+			  lcd_print_cbuff(&rx_cbuffer);
+			  uart_putch_cbuffer(&rx_cbuffer, (rsize+1));
 		  }
 
 		  // Disconnect the socket

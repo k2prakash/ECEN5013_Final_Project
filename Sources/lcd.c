@@ -306,6 +306,25 @@ void lcd_put_str(char * str)
 	return;
 }
 
+void lcd_print_cbuff(cbuffer* buff)
+{
+	uint8_t* head = buff->head;
+	uint8_t* tail = buff->tail;
+	while(tail != head){
+
+		if(tail == (buff->end))
+		{
+			lcd_put_ch(*tail);
+			tail = buff->start;
+		}
+		else
+		{
+			lcd_put_ch(*tail++);
+		}
+
+	}
+}
+
 
 
 

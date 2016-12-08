@@ -137,9 +137,11 @@ uint16_t send(uint8_t sock,const uint8_t *buf,uint16_t buflen)
     return 1;
 }
 
-uint16_t recv(uint8_t sock,uint8_t *buf,uint16_t buflen)
+//uint16_t recv(uint8_t sock,uint8_t *buf,uint16_t buflen)
+uint16_t recv(uint8_t sock,cbuffer * rxbuf, uint16_t buflen)
 {
     uint16_t ptr,offaddr,realaddr;
+    uint8_t data;
 
     if (buflen <= 0 || sock != 0) return 1;
 
@@ -150,17 +152,19 @@ uint16_t recv(uint8_t sock,uint8_t *buf,uint16_t buflen)
     ptr = addr_read(S0_RX_RD);
     offaddr = (((ptr & 0x00FF) << 8 ) + addr_read(S0_RX_RD + 1));
 #if _DEBUG_MODE
-    printf("RX Buffer: %x\n",offaddr);
+    //log0("NIC RX Buffer is at:",offaddr);
 #endif
 
     while(buflen) {
       buflen--;
       realaddr=RXBUFADDR + (offaddr & RX_BUF_MASK);
-      *buf = addr_read(realaddr);
+      data = addr_read(realaddr);
+      cbuffer_add(rxbuf, &data);
       offaddr++;
-      buf++;
+      //buf++;
     }
-    *buf='\0';        // String terminated character
+    data='\0';        // String terminated character
+    cbuffer_add(rxbuf, &data);
 
     // Increase the S0_RX_RD value, so it point to the next receive
     addr_write(S0_RX_RD,(offaddr & 0xFF00) >> 8 );
