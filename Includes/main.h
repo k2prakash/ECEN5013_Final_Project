@@ -22,11 +22,14 @@
 #include "socket.h"
 #include "cbuffer.h"
 #include "uart_buffer.h"
+#include "gpio.h"
 
 
 #define BAUDRATE 						115200
 #define ROW_COL_STR_BUFFER_SIZE 		2
-#define _DEBUG_MODE      1
+#define _DEBUG_MODE      				1
+#define GET_STR							"GET /"
+#define POST_STR						"POST /"
 
 void call_to_server();
 void lcd_print();

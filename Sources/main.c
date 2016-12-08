@@ -43,8 +43,7 @@ uint16_t rsize;
 int getidx,postidx;
 uint8_t buf[MAX_BUF];
 cbuffer rx_cbuffer;
-//cbuffer* tx_cbuffer;
-
+uint8_t led_status = 0;
 
 
 /*
@@ -70,13 +69,14 @@ int main(void)
     sockreg=0;
 	// __enable_irq();
     cbuffer_init(&rx_cbuffer,MAX_BUF);
-    //cbuffer_init(tx_cbuffer,MAX_BUF);
     uart0_init(BAUDRATE);
 	lcd_init();
 	i2c_init();
 	spi_init();
 	wiznet_init();
+	gpio_init();
 	eeprom_reset();
+
 
     for (;;) {
 
@@ -88,6 +88,9 @@ int main(void)
 
 void call_to_server()
 {
+	char radiostat0[10];
+	char radiostat1[10];
+
 	sockstat=addr_read(S0_SR);
 	    switch(sockstat) {
 	     case SOCK_CLOSED:
@@ -108,10 +111,32 @@ void call_to_server()
 		  if (recv(sockreg,&rx_cbuffer,rsize) <= 0) break;
 		  cbuffer_copy_to_str(&rx_cbuffer, buf);
 	      // Check the Request Header
-		  getidx=strindex((char *)buf,"GET /");
-		  postidx=strindex((char *)buf,"POST /");
+		  getidx=strindex((char *)buf,GET_STR);
+		  postidx=strindex((char *)buf,POST_STR);
 		  if (getidx >= 0 || postidx >= 0) {
 
+			  // Now check the Radio Button for POST request
+				if (postidx >= 0)
+				{
+				  if (strindex((char *)buf,"radio=0") > 0)
+		//#if _DEBUG_MODE
+			//
+		//#endif
+				  {
+					log0("LED OFF\r\n",MESSAGE_BUFFER_SIZE_16);
+					LED_OFF;
+				  	led_status = 0;
+				  }
+				  if (strindex((char *)buf,"radio=1") > 0)
+		//#if _DEBUG_MODE
+		//
+		//#endif
+				  {
+					  log0("LED ON\r\n",MESSAGE_BUFFER_SIZE_16);
+					  LED_ON;
+				  	  led_status = 1;
+				  }
+				}
 				log0("Received an HTTP request!\r\n",MESSAGE_BUFFER_SIZE_50);
 				log0("Content:\r\n",MESSAGE_BUFFER_SIZE_16);
 				uart_putch_cbuffer(&rx_cbuffer, (rsize+1));
@@ -122,8 +147,29 @@ void call_to_server()
 				strcat((char *)buf,"<h1>Embedded Web Server</h1>\r\n");
 				strcat((char *)buf,"<h2>A Project by Kaushik and Ryan</h2>\r\n");
 				strcat((char *)buf,"<h3>Components: KL25Z board, WIZ811MJ NIC and HD44780 LCD</h3>\r\n");
-				strcat((char *)buf,"</span></body></html>\r\n");
-					// Now Send the HTTP Remaining Response
+				strcat((char *)buf,"<p><form method=\"POST\">\r\n");
+				if (send(sockreg,buf,strlen((char *)buf)) <= 0) break;
+
+				if (led_status == 1) {
+				  strcpy(radiostat0,"");
+				  strcpy(radiostat1,"checked");
+				} else {
+				  strcpy(radiostat0,"checked");
+				  strcpy(radiostat1,"");
+				}
+
+				// Create the HTTP Radio Button 0 Response
+				strcpy((char *)buf,"<p><input type=\"radio\" name=\"radio\" value=\"0\" ");
+				strcat((char *)buf,radiostat0);
+				strcat((char *)buf,">LED OFF\r\n");
+				strcat((char *)buf,"<br><input type=\"radio\" name=\"radio\" value=\"1\" ");
+				strcat((char *)buf,radiostat1);
+				strcat((char *)buf,">LED ON\r\n");
+				strcat((char *)buf,"<p>\r\n");
+				strcat((char *)buf,"<input type=\"submit\">\r\n");
+				strcat((char *)buf,"</form></span></body></html>\r\n");
+
+				// Now Send the HTTP Remaining Response
 				if (send(sockreg,buf,strlen((char *)buf)) <= 0) break;
 
 		  }
