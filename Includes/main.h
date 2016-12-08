@@ -16,7 +16,6 @@
 #include "data.h"
 #include "log.h"
 #include "i2c.h"
-#include "I2C_n.h"
 #include "eeprom.h"
 #include "spi.h"
 #include "wiznet.h"
