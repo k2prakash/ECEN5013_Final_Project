@@ -52,22 +52,27 @@ uint8_t led_status = 0;
  * inputs a character into the serial debugger
  *
  */
-/*extern void UART0_IRQHandler (void)
+extern void UART0_IRQHandler (void)
 {
 
 	if (UART0_S1 & UART0_S1_RDRF_MASK)
 	{
 		ch = UART0_D;					// Clear the RDRF flag by reading the contents.
-		uart_recieve_cbuffer(&rx_buffer, (uint8_t)ch);
-
+		if(ch == 'y')
+		{
+			LED_ON;
+		} else if (ch == 'n')
+		{
+			LED_OFF;
+		}
 	}
-}*/
+}
 
 int main(void)
 {
     uint8_t val = 0;
     sockreg=0;
-	// __enable_irq();
+	__enable_irq();
     cbuffer_init(&rx_cbuffer,MAX_BUF);
     uart0_init(BAUDRATE);
 	lcd_init();

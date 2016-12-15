@@ -37,7 +37,7 @@ void uart0_init(uint32_t baudrate)
     UART0_C4 = UART0_C4_OSR(CLOCKDIV - 1); // Setting the Over Sampling ratio as 16 - 0b1111. This is the default value.
     UART0_BDL = (bdl - 1);
     UART0_C1 |= UART0_C1_LOOPS(0); // Setting Loop mode to be normal. No Echo where tx output is connected to rx output.
-    //UART0_C2 |= UART0_C2_RIE_MASK; // Enable the Receive Interrupt so that Hardware will set the Interrupt flag
+    UART0_C2 |= UART0_C2_RIE_MASK; // Enable the Receive Interrupt so that Hardware will set the Interrupt flag
     UART0_C2 |= UART0_C2_RE_MASK | UART0_C2_TE_MASK; // Enable Transmitter and Receiver
 
 
